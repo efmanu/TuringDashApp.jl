@@ -88,9 +88,9 @@ function render_uploader()
                             id="dtu-def-data-drop",
                             options =[
                                 Dict("label" => "Select Data", "value" => "0"),
-                                Dict("label" => "Real Estate", "value" => "1"),
-                                Dict("label" => "Solar", "value" => "2"),
-                                Dict("label" => "House Price", "value" => "3")
+                                Dict("label" => "Data 1", "value" => "1"),
+                                Dict("label" => "Data 2", "value" => "2"),
+                                Dict("label" => "Data 3", "value" => "3")
                             ],
                             value="0"
                             )
@@ -128,11 +128,11 @@ function render_liveupdates()
         html_h3("Plots"),
         dcc_interval(
             id="interval-component",
-            interval=1000, # in milliseconds
+            interval=500, # in milliseconds
             n_intervals=0,
             disabled=false
         ),
-        dcc_graph(id="dtu-params-state2",
+        dcc_graph(id="dtu-params-state1",
             figure=Dict(
                 "data" => [
                     Dict("x" => x_graph, "y" => y_graph),

@@ -31,11 +31,11 @@ function parse_contents(contents, filename)
 
   function load_default(val)
     if val == "1"
-      df = CSV.read(download("https://raw.githubusercontent.com/efmanu/fluxdash/master/FluxDash/datasets/real_estate.csv"), DataFrame)
+      df = CSV.read(download("https://raw.githubusercontent.com/efmanu/TuringDashApp.jl/master/TuringDash/datasets/data1.csv"), DataFrame)
     elseif val =="2"
-      df = CSV.read(download("https://raw.githubusercontent.com/efmanu/fluxdash/master/FluxDash/datasets/real_estate.csv"), DataFrame)
+      df = CSV.read(download("https://raw.githubusercontent.com/efmanu/TuringDashApp.jl/master/TuringDash/datasets/data2.csv"), DataFrame)
     else
-      df = CSV.read(download("https://raw.githubusercontent.com/efmanu/fluxdash/master/FluxDash/datasets/real_estate.csv"), DataFrame)
+      df = CSV.read(download("https://raw.githubusercontent.com/efmanu/TuringDashApp.jl/master/TuringDash/datasets/data3.csv"), DataFrame)
     end
     return df
   end

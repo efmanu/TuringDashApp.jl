@@ -1,38 +1,43 @@
 module PrecompileFuncs
-    using OptimDash
-    using OptimDash.Optim
-    using OptimDash.PlotlyJS
+    using TuringDash
+    using TuringDash.Turing
+    using TuringDash.Random
+    using TuringDash.CSV, TuringDash.DataFrames
 
-function precompile_optim()
+function precompile_turing()
     chn = Base.Channel{Vector{Float64}}(Inf)
-    user_funcs = "f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2"
-    funcs_init = "[0.0, 0.0]"
-    lb_str = "[-2.0, -2.0]"
-    ub_str = "[2.0, 2.0]"
-    eval_f, init_f, lb_f, ub_f = OptimDash.eval_definition(
-        user_funcs, funcs_init, lb_str, ub_str
-    )
-    function g(f)
-        function _g(x)
-            put!(chn, x)
-            return Base.invokelatest(f, x)
+    df1 = nothing
+    global df1
+    df1 = CSV.read(download("https://raw.githubusercontent.com/efmanu/TuringDashApp.jl/master/TuringDash/datasets/data1.csv"), DataFrame)
+    model_str1 = """
+    @model turingmodel(x, y) = begin
+        a ~ Normal()
+        b ~ Normal()
+        for i in 1:length(x)
+            y[i] ~ Normal(a + b * x[i], 1.0)
         end
-        return _g
     end
-    results = optimize(g(eval_f), init_f)
+    """
+    model_str2 = "turingmodel(x, y)"
+    for colname in Symbol.(names(df1))
+        @eval $colname = df1.$colname
+    end
     
-    bound_range = (ub_f - lb_f)./1000
-    range_value = [collect(1:10) for _ in 1:2]
-    z =  rand(1:10,10,10)
-    heat_plt = heatmap(
-        x = range_value[1], y = range_value[2], 
-        z = z
-    )
-    # scatter_plt = scatter(
-    #     ;x=x_graph, y=y_graph, 
-    #     mode="lines", line_color="black"
-    # )
-    fig = OptimDash.PlotlyJS.plot(heat_plt)
+    eval(Meta.parse(model_str1))
+    model = eval(Meta.parse(model_str2))
+
+    alg = MH()
+    rng = Random.GLOBAL_RNG
+
+    nperiteration = 50
+    nsamples = 20
+
+    r = sample(rng, model, alg, nperiteration; chain_type=MCMCChains.Chains, save_state=true, progress=false)
+    put!(chn, Array(r)[end,1:2])
+    for i in (nperiteration + 1):nperiteration:nsamples
+        r = Turing.Inference.resume(r, nperiteration, save_state=true, progress=false)
+        put!(chn, Array(r)[end,1:2])
+    end
     return "success"
 end
 end

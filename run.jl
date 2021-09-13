@@ -3,7 +3,7 @@
 using TuringDash
 
 # using .PrecompileFuncs
-# PrecompileFuncs.precompile_optim()
+# PrecompileFuncs.precompile_turing()
 
 app = TuringDash.make_app()
 
