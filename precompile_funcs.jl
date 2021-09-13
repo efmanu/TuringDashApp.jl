@@ -1,8 +1,9 @@
 module PrecompileFuncs
-    using TuringDash
-    using TuringDash.Turing
-    using TuringDash.Random
-    using TuringDash.CSV, TuringDash.DataFrames
+
+using TuringDash
+using TuringDash.Turing
+using TuringDash.Random
+using TuringDash.CSV, TuringDash.DataFrames
 
 function precompile_turing()
     chn = Base.Channel{Vector{Float64}}(Inf)
@@ -10,15 +11,15 @@ function precompile_turing()
     global df1
     df1 = CSV.read(download("https://raw.githubusercontent.com/efmanu/TuringDashApp.jl/master/TuringDash/datasets/data1.csv"), DataFrame)
     model_str1 = """
-    @model turingmodel(x, y) = begin
+    @model regression_model(x, y) = begin
         a ~ Normal()
         b ~ Normal()
-        for i in 1:length(x)
+        for i in 1:10
             y[i] ~ Normal(a + b * x[i], 1.0)
         end
     end
     """
-    model_str2 = "turingmodel(x, y)"
+    model_str2 = "regression_model(x, y)"
     for colname in Symbol.(names(df1))
         @eval $colname = df1.$colname
     end
@@ -26,7 +27,10 @@ function precompile_turing()
     eval(Meta.parse(model_str1))
     model = eval(Meta.parse(model_str2))
 
-    alg = MH()
+    alg = MH(
+        [0.25 0.05;
+         0.05 0.50]
+    )
     rng = Random.GLOBAL_RNG
 
     nperiteration = 50
@@ -40,4 +44,5 @@ function precompile_turing()
     end
     return "success"
 end
+
 end

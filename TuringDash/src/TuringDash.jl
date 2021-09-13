@@ -1,6 +1,5 @@
 module TuringDash
 
-
 include("render_funcs.jl")
 include("utils.jl")
 using Dash, DashBootstrapComponents
@@ -31,7 +30,8 @@ function make_app()
     y_graph1 = []
     itr = 0
     df = nothing
-    
+    nperiteration = 1
+
     external_stylesheets = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     app = dash(external_stylesheets=[dbc_themes.BOOTSTRAP,external_stylesheets], 
 	    suppress_callback_exceptions=true)
@@ -70,30 +70,32 @@ function make_app()
         if (user_funcs == "") || (funcs_init == "")
             throw(PreventUpdate())
         end
-        
+
         x_graph = []
         y_graph = []
         y_graph1 = []
         itr = 0
-              
+
         for colname in Symbol.(names(df))
             @eval $colname = df.$colname
-        end        
-        #evealuate model
+        end
+        # evealuate model
         eval(Meta.parse(user_funcs))
 
         #evaluate eval_definition
         model = eval(Meta.parse(funcs_init))
 
-        alg = MH()
+        alg = MH(
+            [0.25 0.05;
+             0.05 0.50]
+        )
         rng = Random.GLOBAL_RNG
 
-        nperiteration = 5
         nsamples = 1000
         @async begin
             r = sample(rng, model, alg, nperiteration; chain_type=MCMCChains.Chains, save_state=true, progress=false)
             put!(chn, Array(r)[end,1:2])
-            for i in (nperiteration + 1):nperiteration:nsamples
+            for _ in (nperiteration + 1):nperiteration:nsamples
                 r = Turing.Inference.resume(r, nperiteration, save_state=true, progress=false)
                 put!(chn, Array(r)[end,1:2])
             end
@@ -114,7 +116,7 @@ function make_app()
         global x_graph, y_graph, y_graph1, chn, itr
         if isready(chn)
             val = take!(chn)
-            itr += 5
+            itr += nperiteration
             append!(x_graph, itr)
             append!(y_graph, val[1])
 			append!(y_graph1, val[2])

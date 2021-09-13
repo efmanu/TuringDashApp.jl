@@ -6,7 +6,7 @@ function render_all()
         dbc_row([
             render_func_init(),
             dbc_col([
-                dbc_button("Sample !", color="success", id="dtu-btn-turing")
+                dbc_button("Sample", color="success", id="dtu-btn-turing")
             ], md =2),            
             render_plots()
         ])
@@ -17,12 +17,12 @@ function render_info()
         dbc_jumbotron([
             html_h1("Dash Turing App", className="dtu-display-3"),
             html_p(
-                "Web app for Bayesian inference using  Dash.jl and Turing.jl ",
+                "Web app for Bayesian inference using Dash.jl and Turing.jl ",
                 className="lead",
             ),
             html_hr(className="my-2"),
             html_p(
-                "User can define Turing model",
+                "User can define a Turing model. The dataset's column names are available as variable names.",
             )
         ])
     ])
@@ -39,7 +39,7 @@ end
 function render_function()
     return dbc_card([
         dbc_cardbody([
-            html_h4("Model specification", className="card-title"),
+            html_h4("Model specification:", className="card-title"),
             html_div([
                 dbc_textarea(
                     id = "dtu-user-funcs",
@@ -47,10 +47,10 @@ function render_function()
                     className="mb-3",
                     rows  = 6,
                     value="""
-                        @model turingmodel(x, y) = begin
+                        @model regression_model(x, y) = begin
                             a ~ Normal()
                             b ~ Normal()
-                            for i in 1:length(x)
+                            for i in 1:10
                                 y[i] ~ Normal(a + b * x[i], 1.0)
                             end
                         end
@@ -63,13 +63,13 @@ end
 function render_init()
     return dbc_card([
             dbc_cardbody([
-                html_h4("Conditional Model", className="card-title"),
+                html_h4("Conditional model:", className="card-title"),
                 html_div([
                     dbc_input(
                         id = "dtu-user-func-init",
                         bs_size="lg",
                         className="mb-3",
-                        value="turingmodel(x, y)",
+                        value="regression_model(x, y)",
                     )
                 ]),
             ])
@@ -83,7 +83,7 @@ function render_uploader()
                     html_div(
                         id="dtu-def-upload-data",
                         [
-                        html_label("Select a default dataset:")
+                        html_label("Select a dataset:")
                         dcc_dropdown(
                             id="dtu-def-data-drop",
                             options =[
@@ -96,7 +96,7 @@ function render_uploader()
                             )
                         ],
                     ),
-                    html_h3("OR"),
+                    html_h3("or"),
                     dcc_upload(
                         id="dtu-upload-datan",
                         children=html_div([
