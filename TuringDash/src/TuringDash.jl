@@ -91,7 +91,7 @@ function make_app()
         )
         rng = Random.GLOBAL_RNG
 
-        nsamples = 1000
+        nsamples = 500
         @async begin
             r = sample(rng, model, alg, nperiteration; chain_type=MCMCChains.Chains, save_state=true, progress=false)
             put!(chn, Array(r)[end,1:2])
