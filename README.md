@@ -11,7 +11,7 @@ From the project folder, enter the following commands in Julia REPL
 ```
 
 ##### Step 2: Configurations for sampling
-![Animation4](https://user-images.githubusercontent.com/22251968/133113047-30aae141-bd81-417d-bde5-832ac4de3797.gif)
+![Animation5](https://user-images.githubusercontent.com/22251968/133246945-9850a1b2-869a-40c7-8ade-b33e901aa984.gif)
 
 ### Deploy in Herokuapp
 From the project folder, enter the following commands in command line/terminal etc.
